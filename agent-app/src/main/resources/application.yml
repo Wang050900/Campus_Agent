@@ -1,0 +1,43 @@
+# ====================================
+# 校园 AI 助手 — 应用配置文件
+# ====================================
+server:
+  port: 8080
+
+spring:
+  application:
+    name: agent-app
+
+  ai:
+    deepseek:
+      # Spring AI 1.1.6 原生 DeepSeek 支持！
+      # 会自动调用 https://api.deepseek.com/v1/chat/completions
+      api-key: sk-4e99367927b34566bba14356f8cb08fe
+      chat:
+        options:
+          # DeepSeek 最新对话模型
+          model: deepseek-chat
+          # 控制回答的随机性，0=精准，1=有创意，推荐 0.7
+          temperature: 0.7
+          # 最大输出 token 数
+          max-tokens: 2000
+
+# ====================================
+# 配置解读：
+#
+# 1. spring.ai.deepseek.api-key
+#    你的 DeepSeek API Key，直接从官网获取
+#
+# 2. model: deepseek-chat
+#    DeepSeek 的主力对话模型（V3），也支持 deepseek-reasoner（R1 推理模型）
+#
+# 3. temperature: 0.7
+#    0 -> 每次回答都一样（适合事实查询）
+#    1 -> 每次可能不同（适合创意）
+#    0.7 是问答场景的推荐值
+#
+# 4. Spring AI 1.1.6 会自动帮你：
+#    - 创建 ChatClient Bean（可以直接 @Autowired 注入）
+#    - 处理 DeepSeek 的 API 请求/响应
+#    - 管理重试、超时等
+# ====================================
