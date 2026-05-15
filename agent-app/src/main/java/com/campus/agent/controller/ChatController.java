@@ -1,55 +1,84 @@
 package com.campus.agent.controller;
 
+import com.campus.agent.model.ChatResponse;
 import com.campus.agent.service.CampusAIService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 /**
- * 聊天控制器 — 提供 AI 问答的 REST API 接口
+ * 聊天控制器
  *
- * 这个 Controller 负责接收用户的 HTTP 请求，调用 AI Service 处理，
- * 然后把结果返回给前端（浏览器、小程序等）。
- *
- * 你现在可以直接用浏览器或 curl 来测试。
+ * 用法：
+ *   GET  /chat?message=南食堂在哪
+ *   POST /chat  { "message": "南食堂在哪" }
+ *   GET  /      首页
  */
 @RestController
-@RequestMapping("/chat")
 public class ChatController {
+
+    private static final Logger log = LoggerFactory.getLogger(ChatController.class);
 
     private final CampusAIService campusAIService;
 
-    /**
-     * 构造器注入 — Spring 会自动把 CampusAIService 传进来
-     */
     public ChatController(CampusAIService campusAIService) {
         this.campusAIService = campusAIService;
     }
 
     /**
-     * GET 请求：http://localhost:8080/chat?message=南食堂在哪
-     *
-     * @param message 用户输入的问题
-     * @return AI 的回答
+     * 首页 — 直接重定向到前端页面
      */
-    @GetMapping
-    public String chat(@RequestParam("message") String message) {
-        return campusAIService.askAI(message);
+    @GetMapping("/")
+    public String index() {
+        return """
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta http-equiv="refresh" content="0;url=/index.html">
+                    <title>校园 AI 助手</title>
+                </head>
+                <body>
+                    <p>正在跳转到 <a href="/index.html">校园 AI 助手</a>...</p>
+                </body>
+                </html>
+                """;
     }
 
     /**
-     * POST 请求：更正式的 JSON 格式
-     * 请求体：{ "message": "南食堂在哪" }
-     *
-     * @param request 包含 message 字段的 JSON
-     * @return AI 的回答
+     * GET 聊天 — 简单测试用
      */
-    @PostMapping
-    public String chatPost(@RequestBody Map<String, String> request) {
+    @GetMapping("/chat")
+    public ChatResponse chat(@RequestParam(value = "message", required = false) String message) {
+        if (message == null || message.isBlank()) {
+            return new ChatResponse("请告诉我你的问题！例如：/chat?message=南食堂在哪", null);
+        }
+        try {
+            return campusAIService.askAI(message);
+        } catch (Exception e) {
+            log.error("AI 问答出错: {}", e.getMessage(), e);
+            return new ChatResponse("小C遇到了一点问题：" + e.getMessage(), null);
+        }
+    }
+
+    /**
+     * POST 聊天 — 前端主调用的接口
+     * 请求体：{ "message": "体育选修课选课时间" }
+     * 返回：{ "answer": "...", "sources": [...] }
+     */
+    @PostMapping("/chat")
+    public ChatResponse chatPost(@RequestBody Map<String, String> request) {
         String message = request.get("message");
         if (message == null || message.isBlank()) {
-            return "请输入问题！";
+            return new ChatResponse("请输入问题！", null);
         }
-        return campusAIService.askAI(message);
+        try {
+            return campusAIService.askAI(message);
+        } catch (Exception e) {
+            log.error("AI 问答出错: {}", e.getMessage(), e);
+            return new ChatResponse("小C遇到了一点问题：" + e.getMessage(), null);
+        }
     }
 }

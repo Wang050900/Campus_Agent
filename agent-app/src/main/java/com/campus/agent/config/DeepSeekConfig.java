@@ -81,14 +81,23 @@ public class DeepSeekConfig {
     }
 
     /**
-     * 创建 ChatClient.Builder
-     *
-     * 这是 Spring AI 推荐的高级 API。
-     * 在 Service 层注入 ChatClient.Builder，用它创建 ChatClient 实例。
-     * 我们会在 CampusAIService 中通过 defaultSystem() 来设置校园知识库。
+     * 创建 ChatClient.Builder（用于基础问答）
      */
     @Bean
     public ChatClient.Builder chatClientBuilder(DeepSeekChatModel deepSeekChatModel) {
+        return ChatClient.builder(deepSeekChatModel);
+    }
+
+    /**
+     * 创建另一个 ChatClient.Builder（用于 RAG 问答）
+     * 
+     * 为什么要两个 Builder？
+     * 因为基础问答和 RAG 问答的 System Prompt 不同，
+     * 我们用不同的 Builder + defaultSystem() 来区分，
+     * 避免互相覆盖。
+     */
+    @Bean
+    public ChatClient.Builder ragChatClientBuilder(DeepSeekChatModel deepSeekChatModel) {
         return ChatClient.builder(deepSeekChatModel);
     }
 }

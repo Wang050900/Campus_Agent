@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园 AI 助手 — 小C</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 顶部导航栏 -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo-icon">🎓</div>
+                <div>
+                    <h1>校园 AI 助手</h1>
+                    <span class="header-subtitle">小C · 你的校园智能管家</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <span class="model-badge">DeepSeek + RAG</span>
+            </div>
+        </header>
+
+        <!-- 聊天主体区域 -->
+        <main class="chat-main">
+            <div id="chat-messages" class="chat-messages">
+                <!-- 欢迎卡片 -->
+                <div class="message welcome-card">
+                    <div class="welcome-icon">👋</div>
+                    <h2>你好！我是小C</h2>
+                    <p>你的校园智能助手，我可以帮你：</p>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <span class="feature-icon">📚</span>
+                            <span>查询校园资讯（已接入校园网）</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">📍</span>
+                            <span>回答校园地点、老师办公室等问题</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">📅</span>
+                            <span>了解选课安排、活动信息</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">📋</span>
+                            <span>查询办事流程（请假、借书等）</span>
+                        </div>
+                    </div>
+                    <p class="welcome-hint">试试问我下面的问题 👇</p>
+                    <div class="suggestions">
+                        <button class="suggestion-btn" onclick="askSuggestion('体育选修课选课时间是什么时候？')">🏀 体育选课</button>
+                        <button class="suggestion-btn" onclick="askSuggestion('通宵自习室在哪开放？')">📖 自习室</button>
+                        <button class="suggestion-btn" onclick="askSuggestion('校园科技文化节有什么活动？')">🎪 文化节</button>
+                        <button class="suggestion-btn" onclick="askSuggestion('南食堂在哪')">🍜 南食堂</button>
+                        <button class="suggestion-btn" onclick="askSuggestion('图书馆端午节开放安排？')">🏛️ 图书馆</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 加载指示器 -->
+            <div id="loading-indicator" class="loading-indicator" style="display: none;">
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <span class="loading-text">小C正在思考...</span>
+            </div>
+        </main>
+
+        <!-- 底部输入区域 -->
+        <footer class="chat-footer">
+            <div class="input-container">
+                <textarea
+                    id="message-input"
+                    class="message-input"
+                    placeholder="输入你的问题，按 Enter 发送..."
+                    rows="1"
+                ></textarea>
+                <button id="send-button" class="send-button" onclick="sendMessage()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+            <p class="footer-note">小C基于 DeepSeek 大模型 + RAG 检索技术，回答仅供参考</p>
+        </footer>
+    </div>
+
+    <script src="/js/chat.js"></script>
+</body>
+</html>
