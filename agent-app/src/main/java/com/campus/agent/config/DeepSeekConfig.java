@@ -14,16 +14,6 @@ import io.micrometer.observation.ObservationRegistry;
 
 /**
  * DeepSeek 模型配置
- *
- * 为什么需要手动配置？
- * spring-ai-deepseek 模块（1.1.6）提供了 DeepSeekChatModel，但没有自动配置（AutoConfiguration）。
- * 所以我们需要手动创建 DeepSeekApi → DeepSeekChatModel → ChatClient.Builder 的 Bean 链条。
- *
- * 知识点：
- *   DeepSeekApi         — 封装了 HTTP 请求，管理 API Key、Base URL
- *   DeepSeekChatOptions — 设定模型参数（model, temperature, maxTokens 等）
- *   DeepSeekChatModel   — 实现了 ChatModel 接口，是 Spring AI 的核心抽象
- *   ChatClient          — 高级 API，提供 prompt()、user()、call() 等链式调用
  */
 @Configuration
 public class DeepSeekConfig {
@@ -37,8 +27,6 @@ public class DeepSeekConfig {
     ) {
         return DeepSeekApi.builder()
                 .apiKey(apiKey)
-                // DeepSeek 默认就是 https://api.deepseek.com，
-                // 但显式写上更清晰，也方便以后改成私有部署地址
                 .baseUrl("https://api.deepseek.com")
                 .build();
     }
@@ -60,21 +48,34 @@ public class DeepSeekConfig {
     }
 
     /**
+     * ToolCallingManager Bean —— 管理 AI 工具调用
+     *
+     * 多个组件需要同一个 ToolCallingManager 实例：
+     *   - DeepSeekChatModel：底层模型需要它来处理工具调用
+     *   - ToolCallAdvisor：高级 advisor 也需要它
+     *   所以提取为独立的 @Bean，避免重复创建。
+     */
+    @Bean
+    public ToolCallingManager toolCallingManager() {
+        return ToolCallingManager.builder().build();
+    }
+
+    /**
      * 创建 DeepSeek ChatModel（核心 Bean）
      *
      * ChatModel 是 Spring AI 中最核心的接口，代表一个大语言模型。
      * DeepSeekChatModel 就是 ChatModel 的 DeepSeek 实现。
-     * 后续 Phase 3 添加 Tool Calling 时，会用到这里的 ToolCallingManager。
      */
     @Bean
     public DeepSeekChatModel deepSeekChatModel(
             DeepSeekApi deepSeekApi,
-            DeepSeekChatOptions deepSeekChatOptions
+            DeepSeekChatOptions deepSeekChatOptions,
+            ToolCallingManager toolCallingManager
     ) {
         return DeepSeekChatModel.builder()
                 .deepSeekApi(deepSeekApi)
                 .defaultOptions(deepSeekChatOptions)
-                .toolCallingManager(ToolCallingManager.builder().build())
+                .toolCallingManager(toolCallingManager)
                 .retryTemplate(RetryTemplate.defaultInstance())
                 .observationRegistry(ObservationRegistry.create())
                 .build();

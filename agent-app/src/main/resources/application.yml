@@ -1,6 +1,7 @@
-# ====================================
-# 校园 AI 助手 — 应用配置文件
-# ====================================
+# ================================================
+# 校园 AI 助手 — 应用配置文件（Phase 4 升级）
+# 新增：MySQL 数据库 + MyBatis + JWT 认证
+# ================================================
 server:
   port: 8080
 
@@ -8,18 +9,71 @@ spring:
   application:
     name: agent-app
 
+  # ---------- DevTools：热更新 + 自动重启 ----------
+  devtools:
+    restart:
+      enabled: true
+      poll-interval: 1s
+      quiet-period: 400ms
+    livereload:
+      enabled: true
+      port: 35729
+
+  # ---------- MySQL 数据库 ----------
+  datasource:
+    url: jdbc:mysql://localhost:3306/campus_agent?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    username: root
+    password: wzz808911
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+
+  # ---------- DeepSeek AI ----------
   ai:
     deepseek:
       api-key: sk-4e99367927b34566bba14356f8cb08fe
       chat:
         options:
           model: deepseek-chat
-          temperature: 0.7
+          temperature: 0.5
           max-tokens: 2000
 
-# 校园网配置
+# ---------- MyBatis 配置 ----------
+mybatis:
+  mapper-locations: classpath*:com/campus/agent/mapper/*.xml
+  type-aliases-package: com.campus.agent.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+
+# ---------- 日志级别 ----------
+logging:
+  level:
+    com.campus.agent.mapper: DEBUG
+
+# ---------- JWT 配置 ----------
+app:
+  jwt:
+    secret: Campus-Agent-2026-Secret-Key-K8x9mP2qR5vY7wZ3!@#$%^&*()_+=-0987654321
+    expiration: 86400000  # 24 小时（毫秒）
+
+# ---------- 校园网配置（保留，后续可扩展） ----------
 campus:
   website:
     base-url: https://www.xxu.edu.cn
-    # 种子文章 YAML 文件路径
-    seed-data: classpath:data/campus-articles.yml
+
+# ---------- XXL-Job 分布式调度配置 ----------
+xxl:
+  job:
+    admin:
+      addresses: http://localhost:8088/xxl-job-admin
+    accessToken: default_token
+    executor:
+      appname: campus-agent-executor
+      address:
+      ip:
+      port: 9999
+      logpath: /data/applogs/xxl-job/jobhandler
+      logretentiondays: 30

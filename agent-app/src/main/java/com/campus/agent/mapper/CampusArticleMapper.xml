@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campus.agent.mapper.CampusArticleMapper">
+    <resultMap id="BaseResultMap" type="com.campus.agent.entity.CampusArticle">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="url" column="url"/>
+        <result property="content" column="content"/>
+        <result property="category" column="category"/>
+        <result property="publishDate" column="publish_date"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT * FROM campus_article
+    </select>
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT * FROM campus_article WHERE id = #{id}
+    </select>
+    <!-- 使用 MySQL LIKE 模糊搜索 -->
+    <select id="search" resultMap="BaseResultMap">
+        SELECT * FROM campus_article
+        WHERE title LIKE CONCAT('%', #{keyword}, '%')
+           OR content LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO campus_article (title, url, content, category, publish_date)
+        VALUES (#{title}, #{url}, #{content}, #{category}, #{publishDate})
+    </insert>
+</mapper>

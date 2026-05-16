@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campus.agent.mapper.SxlgOfficialArticleMapper">
+    <resultMap id="BaseResultMap" type="com.campus.agent.entity.SxlgOfficialArticle">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="url" column="url"/>
+        <result property="content" column="content"/>
+        <result property="summary" column="summary"/>
+        <result property="category" column="category"/>
+        <result property="publishDate" column="publish_date"/>
+        <result property="author" column="author"/>
+        <result property="coverImage" column="cover_image"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="crawlStatus" column="crawl_status"/>
+        <result property="crawlTime" column="crawl_time"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="findByUrl" resultMap="BaseResultMap">
+        SELECT * FROM sxlg_official_article WHERE url = #{url}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sxlg_official_article (title, url, content, summary, category, publish_date, author, cover_image, view_count, crawl_status, crawl_time)
+        VALUES (#{title}, #{url}, #{content}, #{summary}, #{category}, #{publishDate}, #{author}, #{coverImage}, #{viewCount}, #{crawlStatus}, #{crawlTime})
+    </insert>
+
+    <update id="update">
+        UPDATE sxlg_official_article
+        SET content=#{content}, summary=#{summary}, author=#{author}, cover_image=#{coverImage}, view_count=#{viewCount}, crawl_status=#{crawlStatus}
+        WHERE id=#{id}
+    </update>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT * FROM sxlg_official_article ORDER BY publish_date DESC
+    </select>
+
+    <select id="findByCategory" resultMap="BaseResultMap">
+        SELECT * FROM sxlg_official_article WHERE category = #{category} ORDER BY publish_date DESC
+    </select>
+
+    <select id="search" resultMap="BaseResultMap">
+        SELECT * FROM sxlg_official_article
+        WHERE title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY publish_date DESC
+    </select>
+
+    <select id="findLatest" resultMap="BaseResultMap">
+        SELECT * FROM sxlg_official_article ORDER BY publish_date DESC LIMIT #{limit}
+    </select>
+</mapper>

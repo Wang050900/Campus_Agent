@@ -31,3 +31,4 @@ build/
 
 ### Mac OS ###
 .DS_Store
+/agent-app/src/main/java/com/campus/agent/config/SchedulingConfig.java

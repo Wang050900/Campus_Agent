@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#007AFF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>登录 · 校园 AI 助手</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+    <style>
+        /* ====== Apple 风格登录页面 ====== */
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .login-card {
+            width: 100%;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 40px 32px 36px;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-brand {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-brand .logo-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .login-brand h1 {
+            font-size: 26px;
+            font-weight: 300;
+            color: #1d1d1f;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+
+        .login-brand p {
+            color: #86868b;
+            font-size: 14px;
+        }
+
+        /* Apple 风格 Tab — 底部细线 */
+        .login-tabs {
+            display: flex;
+            margin-bottom: 28px;
+            border-bottom: 1px solid #e5e5ea;
+        }
+
+        .login-tab {
+            flex: 1;
+            padding: 10px 0;
+            text-align: center;
+            border: none;
+            background: transparent;
+            color: #86868b;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            position: relative;
+        }
+
+        .login-tab.active {
+            color: #007AFF;
+        }
+
+        .login-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 20%;
+            right: 20%;
+            height: 2px;
+            background: #007AFF;
+            border-radius: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #86868b;
+            margin-bottom: 6px;
+        }
+
+        /* Apple 风格输入框 — 底部边框仅 */
+        .form-group input {
+            width: 100%;
+            padding: 12px 0;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #e5e5ea;
+            color: #1d1d1f;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus {
+            border-bottom-color: #007AFF;
+        }
+
+        .form-group input::placeholder {
+            color: #aeaeb2;
+        }
+
+        .form-group.hidden {
+            display: none;
+        }
+
+        /* Apple 风格按钮 — 蓝色填充圆角 */
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #007AFF;
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 8px;
+            font-family: inherit;
+        }
+
+        .login-btn:hover {
+            background: #0066D6;
+        }
+
+        .login-btn:active {
+            transform: scale(0.98);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .login-error {
+            background: #fff2f0;
+            border: 1px solid #ffccc7;
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: #e74c3c;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .login-error.visible {
+            display: block;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #aeaeb2;
+        }
+
+        .login-footer a {
+            color: #007AFF;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 密码切换按钮 */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 44px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #aeaeb2;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+        }
+
+        .password-toggle:hover {
+            color: #86868b;
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 32px 24px;
+                border-radius: 16px;
+            }
+
+            .login-brand h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="login-card">
+            <!-- 品牌 -->
+            <div class="login-brand">
+                <span class="logo-icon">🎓</span>
+                <h1>校园 AI 助手</h1>
+                <p>小C · 你的校园智能管家</p>
+            </div>
+
+            <!-- 错误消息 -->
+            <div id="login-error" class="login-error"></div>
+
+            <!-- Tab 切换（Apple 细线分隔） -->
+            <div class="login-tabs">
+                <button class="login-tab active" data-tab="login" onclick="switchTab('login')">登录</button>
+                <button class="login-tab" data-tab="register" onclick="switchTab('register')">注册</button>
+            </div>
+
+            <!-- 登录表单 -->
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="login-username" placeholder="请输入用户名" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="login-password" placeholder="请输入密码" required autocomplete="current-password">
+                        <button type="button" class="password-toggle" onclick="togglePassword('login-password', this)" tabindex="-1">👁️</button>
+                    </div>
+                </div>
+                <button type="submit" class="login-btn" id="login-btn">
+                    登录
+                </button>
+            </form>
+
+            <!-- 注册表单 -->
+            <form id="register-form" style="display:none;" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="reg-username" placeholder="请设置用户名" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="reg-password" placeholder="至少 6 位密码" required minlength="6" autocomplete="new-password">
+                        <button type="button" class="password-toggle" onclick="togglePassword('reg-password', this)" tabindex="-1">👁️</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>昵称</label>
+                    <input type="text" id="reg-nickname" placeholder="给自己起个名字（选填）" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>班级</label>
+                    <input type="text" id="reg-class" placeholder="如：计科2024-1班（选填）" autocomplete="off">
+                </div>
+                <button type="submit" class="login-btn" id="register-btn">
+                    注册
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <span id="footer-text">没有账号？</span>
+                <a id="footer-link" onclick="switchTab('register')">去注册</a>
+                <span style="margin:0 8px;color:#aeaeb2">|</span>
+                <a href="/index.html">回到首页</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ====== Tab 切换 ======
+        function switchTab(tab) {
+            document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+            document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+            document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
+            document.getElementById('login-error').classList.remove('visible');
+
+            const footerText = document.getElementById('footer-text');
+            const footerLink = document.getElementById('footer-link');
+            if (tab === 'login') {
+                footerText.textContent = '没有账号？';
+                footerLink.textContent = '去注册';
+                footerLink.setAttribute('onclick', "switchTab('register')");
+            } else {
+                footerText.textContent = '已有账号？';
+                footerLink.textContent = '去登录';
+                footerLink.setAttribute('onclick', "switchTab('login')");
+            }
+        }
+
+        // ====== 密码显示切换 ======
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            btn.textContent = isPassword ? '🙈' : '👁️';
+        }
+
+        // ====== 显示错误 ======
+        function showError(msg) {
+            const el = document.getElementById('login-error');
+            el.textContent = msg;
+            el.classList.add('visible');
+        }
+
+        function hideError() {
+            document.getElementById('login-error').classList.remove('visible');
+        }
+
+        // ====== 设置按钮加载状态 ======
+        function setLoading(btnId, loading) {
+            const btn = document.getElementById(btnId);
+            if (loading) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="loading-spinner"></span> 处理中...';
+            } else {
+                btn.disabled = false;
+                btn.textContent = btnId === 'login-btn' ? '登录' : '注册';
+            }
+        }
+
+        // ====== 登录处理 ======
+        async function handleLogin(e) {
+            e.preventDefault();
+            hideError();
+            setLoading('login-btn', true);
+
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            if (!username || !password) {
+                showError('请输入用户名和密码');
+                setLoading('login-btn', false);
+                return;
+            }
+
+            try {
+                const res = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    showError(data.error || '登录失败，请检查用户名和密码');
+                    setLoading('login-btn', false);
+                    return;
+                }
+
+                // 登录成功！保存 token 和用户信息
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+
+                // 跳转到聊天页面
+                window.location.href = '/index.html?login=success';
+
+            } catch (err) {
+                showError('网络错误，请检查连接');
+                console.error(err);
+            }
+
+            setLoading('login-btn', false);
+        }
+
+        // ====== 注册处理 ======
+        async function handleRegister(e) {
+            e.preventDefault();
+            hideError();
+            setLoading('register-btn', true);
+
+            const username = document.getElementById('reg-username').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const nickname = document.getElementById('reg-nickname').value.trim();
+            const studentClass = document.getElementById('reg-class').value.trim();
+
+            if (!username || !password) {
+                showError('用户名和密码不能为空');
+                setLoading('register-btn', false);
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('密码至少 6 位');
+                setLoading('register-btn', false);
+                return;
+            }
+
+            try {
+                const res = await fetch('/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username,
+                        password,
+                        nickname: nickname || undefined,
+                        studentClass: studentClass || undefined
+                    })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    showError(data.error || '注册失败');
+                    setLoading('register-btn', false);
+                    return;
+                }
+
+                // 注册成功，提示并切换到登录
+                showError('注册成功！请登录');
+                document.getElementById('login-error').style.color = '#00b894';
+                setTimeout(() => {
+                    document.getElementById('login-error').style.color = '';
+                    switchTab('login');
+                    document.getElementById('login-username').value = username;
+                }, 1200);
+
+            } catch (err) {
+                showError('网络错误，请检查连接');
+                console.error(err);
+            }
+
+            setLoading('register-btn', false);
+        }
+
+        // ====== 页面加载完成 ======
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('login') === 'success') {
+                // 已登录跳转到首页，无需操作
+            }
+        });
+    </script>
+</body>
+</html>

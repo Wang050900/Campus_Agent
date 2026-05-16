@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campus.agent.mapper.CampusNewsMapper">
+    <resultMap id="BaseResultMap" type="com.campus.agent.entity.CampusNews">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="category" column="category"/>
+        <result property="publishDate" column="publish_date"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="findByCategory" resultMap="BaseResultMap">
+        SELECT * FROM campus_news
+        WHERE category = #{category}
+        ORDER BY publish_date DESC
+    </select>
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT * FROM campus_news ORDER BY publish_date DESC
+    </select>
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT * FROM campus_news WHERE id = #{id}
+    </select>
+</mapper>

@@ -3,17 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#6C5CE7">
+    <meta name="theme-color" content="#007AFF">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>校园 AI 助手 — 小C</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
 </head>
 <body>
-
-    <!-- 背景装饰 -->
-    <div class="bg-decorations"></div>
 
     <div class="app-container">
 
@@ -28,6 +25,10 @@
             </div>
             <div class="header-right">
                 <span class="model-badge">DeepSeek + RAG</span>
+                <div id="user-area" class="user-area" style="display:flex;align-items:center;">
+                    <button id="login-btn-header" class="header-login-btn" onclick="window.location.href='/login.html'" style="display:none;">登录</button>
+                    <button id="user-avatar-btn" class="user-avatar-btn" onclick="handleAvatarClick()" style="display:none;" title="点击退出登录"></button>
+                </div>
                 <button id="theme-toggle" class="theme-toggle" aria-label="切换主题">☀️</button>
             </div>
         </header>
@@ -110,6 +111,46 @@
 
     <!-- Toast 容器 -->
     <div id="toast" class="toast"></div>
+
+    <!-- ====== 用户登录状态检查（放在 chat.js 之前） ====== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token');
+            const loginBtn = document.getElementById('login-btn-header');
+            const avatarBtn = document.getElementById('user-avatar-btn');
+
+            if (token) {
+                // 已登录：隐藏登录按钮，显示头像
+                loginBtn.style.display = 'none';
+                avatarBtn.style.display = 'flex';
+
+                try {
+                    const user = JSON.parse(localStorage.getItem('user') || '{}');
+                    if (user.nickname) {
+                        avatarBtn.textContent = user.nickname.charAt(0).toUpperCase();
+                    } else if (user.username) {
+                        avatarBtn.textContent = user.username.charAt(0).toUpperCase();
+                    } else {
+                        avatarBtn.textContent = 'U';
+                    }
+                } catch(e) {
+                    avatarBtn.textContent = 'U';
+                }
+            } else {
+                // 未登录：显示登录按钮
+                loginBtn.style.display = 'inline-flex';
+                avatarBtn.style.display = 'none';
+            }
+        });
+
+        function handleAvatarClick() {
+            if (confirm('是否退出登录？')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.reload();
+            }
+        }
+    </script>
 
     <script src="/js/chat.js"></script>
 </body>

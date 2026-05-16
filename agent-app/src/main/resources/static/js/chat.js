@@ -82,7 +82,7 @@ function appendUserMessage(text) {
     scrollToBottom();
 }
 
-function appendAssistantMessage(text, sources) {
+function appendAssistantMessage(text, sources, mode, toolCalls) {
     const container = document.getElementById('chat-messages');
     const div = document.createElement('div');
     div.className = 'message assistant';
@@ -90,6 +90,24 @@ function appendAssistantMessage(text, sources) {
     const rendered = renderMarkdown(text);
 
     let html = `<div class="bubble">${rendered}</div>`;
+
+    // 工具调用卡片
+    if (mode === 'TOOL' && toolCalls && toolCalls.length > 0) {
+        html += '<div class="tool-calls-section">';
+        html += '<div class="tool-calls-badge">🔧 工具调用</div>';
+        toolCalls.forEach(tool => {
+            html += `
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <span class="tool-name">${escapeHtml(tool.toolName)}</span>
+                        <span class="tool-desc">${escapeHtml(tool.description)}</span>
+                    </div>
+                    <div class="tool-result">${escapeHtml(tool.result || '')}</div>
+                </div>
+            `;
+        });
+        html += '</div>';
+    }
 
     // 来源卡片
     if (sources && sources.length > 0) {
@@ -251,19 +269,27 @@ async function sendMessage() {
     showLoading(true);
 
     try {
+        const token = localStorage.getItem('token') || '';
+
         const response = await fetch('/chat', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token ? 'Bearer ' + token : ''
+            },
             body: JSON.stringify({ message })
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+        if (response.status === 401) {
+            showLoading(false);
+            appendAssistantMessage('⏰ 登录已过期，请重新登录。', null);
+            setTimeout(() => { window.location.href = '/login.html'; }, 2000);
+            return;
         }
 
         const data = await response.json();
         showLoading(false);
-        appendAssistantMessage(data.answer, data.sources);
+        appendAssistantMessage(data.answer, data.sources, data.mode, data.toolCalls);
 
     } catch (error) {
         showLoading(false);

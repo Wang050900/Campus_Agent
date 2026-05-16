@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campus.agent.mapper.ClassroomMapper">
+    <resultMap id="BaseResultMap" type="com.campus.agent.entity.Classroom">
+        <id property="id" column="id"/>
+        <result property="building" column="building"/>
+        <result property="roomNumber" column="room_number"/>
+        <result property="capacity" column="capacity"/>
+        <result property="hasProjector" column="has_projector"/>
+        <result property="hasAc" column="has_ac"/>
+        <result property="isFree" column="is_free"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="findFreeByBuilding" resultMap="BaseResultMap">
+        SELECT * FROM classroom WHERE building = #{building} AND is_free = 1
+    </select>
+    <select id="findByBuilding" resultMap="BaseResultMap">
+        SELECT * FROM classroom WHERE building = #{building}
+    </select>
+</mapper>
