@@ -114,6 +114,19 @@
 
     <!-- ====== 用户登录状态检查（放在 chat.js 之前） ====== -->
     <script>
+        // ====== 页面加载前：如果 localStorage 有 token 但 URL 没有，则补上 ======
+        (function ensureTokenInUrl() {
+            const url = new URL(window.location.href);
+            if (!url.searchParams.has('token')) {
+                const saved = localStorage.getItem('token');
+                if (saved) {
+                    url.searchParams.set('token', saved);
+                    window.location.replace(url.toString());
+                    return; // 停止后续执行，等待重定向
+                }
+            }
+        })();
+
         document.addEventListener('DOMContentLoaded', function() {
             const token = localStorage.getItem('token');
             const loginBtn = document.getElementById('login-btn-header');

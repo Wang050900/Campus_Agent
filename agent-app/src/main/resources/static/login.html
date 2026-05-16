@@ -413,8 +413,8 @@
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
 
-                // 跳转到聊天页面
-                window.location.href = '/index.html?login=success';
+                // 跳转到聊天页面（携带 token 参数供拦截器校验）
+                window.location.href = '/index.html?token=' + encodeURIComponent(data.token);
 
             } catch (err) {
                 showError('网络错误，请检查连接');
